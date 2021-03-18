@@ -4,7 +4,10 @@ using System.Text;
 
 namespace SmartBrewApp.Models
 {
-    public class Preferences
+    /// <summary>
+    /// Class for storing a user's drinking preferences
+    /// </summary>
+    public class Preferences : Item // not sure if this needs to inherit from 'Item' but it may make UI integration easier?
     {
         public double DrinkingTemperature { get; set; } = 195;
 
