@@ -7,7 +7,7 @@ namespace SmartBrewApp.Models
     /// <summary>
     /// class used for tracking a users drinking habits
     /// </summary>
-    internal class BrewerStats : Item // not sure if this needs to inherit from 'Item' but it may make UI integration easier?
+    public class BrewerStats : Item // not sure if this needs to inherit from 'Item' but it may make UI integration easier?
     {
         public double AverageTemperature { get; set; }
 

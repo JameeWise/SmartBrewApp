@@ -11,9 +11,7 @@ namespace SmartBrewApp.Services
 
 
     /** Functions still needed (not a complete list and all are subject for discussion)
-     *  GET User preferences 
      *  GET Brew status
-     *  POST start brew
      *  likely several more I am missing 
      *  most of these likely need a corresponding endpoint in the API as well
      */
@@ -37,6 +35,19 @@ namespace SmartBrewApp.Services
                 BaseAddress = new Uri($"{_baseURL}/")
             };
 
+        }
+
+        public async Task<bool> StartNewBrew(int userId)
+        {
+            Uri endpoint = new Uri(_client.BaseAddress + "Brew");
+
+            string serializedData = JsonConvert.SerializeObject(userId);
+            byte[] buffer = Encoding.UTF8.GetBytes(serializedData);
+            ByteArrayContent byteContent = new ByteArrayContent(buffer);
+
+            HttpResponseMessage response = await _client.PostAsync(endpoint, byteContent).ConfigureAwait(false);
+
+            return response.IsSuccessStatusCode;
         }
 
         /// <summary>
@@ -66,6 +77,30 @@ namespace SmartBrewApp.Services
             bool.TryParse(response.Trim(), out bool isLow);
 
             return isLow;
+        }
+
+        #region User Based Settings
+
+        public async Task<User> GetCurrentUser(int id)
+        {
+            Uri endpoint = new Uri($"{_client.BaseAddress}User/{id}");
+            
+            string response = await _client.GetStringAsync(endpoint).ConfigureAwait(false);
+            User user = JsonConvert.DeserializeObject<User>(response);
+
+            return user;
+
+        }
+
+        public async Task<Preferences> GetUserPreferences(int userId)
+        {
+            Uri endpoint = new Uri($"{_client.BaseAddress}Preferences/{userId}");
+            
+            string response = await _client.GetStringAsync(endpoint).ConfigureAwait(false);
+            Preferences userPrefs = JsonConvert.DeserializeObject<Preferences>(response);
+
+            return userPrefs;
+
         }
 
         public async Task<bool> UpdatePreferences(Preferences prefs)
@@ -113,5 +148,8 @@ namespace SmartBrewApp.Services
 
             return response.IsSuccessStatusCode;
         }
+
+
+        #endregion
     }
 }
