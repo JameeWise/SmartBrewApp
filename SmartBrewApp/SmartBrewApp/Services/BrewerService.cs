@@ -24,7 +24,7 @@ namespace SmartBrewApp.Services
     {
         // base URL of the API, subject to change based on the API project
         // should be in the form http://<pi-IP>:<port>
-        private readonly string _baseURL = @"http://localhost:5000/api/smartBrewer";
+        private readonly string _baseURL = @"http://localhost:5000/api/smartBrewerapi";
 
         private readonly HttpClient _client;
 
