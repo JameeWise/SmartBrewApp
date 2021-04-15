@@ -37,11 +37,11 @@ namespace SmartBrewApp.Services
 
         }
 
-        public async Task<bool> StartNewBrew(int userId)
+        public async Task<bool> StartNewBrew(int userId, int desiredCups)
         {
-            Uri endpoint = new Uri(_client.BaseAddress + "Brew");
+            Uri endpoint = new Uri(_client.BaseAddress + $"Brew/{userId}");
 
-            string serializedData = JsonConvert.SerializeObject(userId);
+            string serializedData = JsonConvert.SerializeObject(desiredCups);
             byte[] buffer = Encoding.UTF8.GetBytes(serializedData);
             ByteArrayContent byteContent = new ByteArrayContent(buffer);
 
@@ -54,10 +54,10 @@ namespace SmartBrewApp.Services
         /// Fetch the current temperature of the brew
         /// </summary>
         /// <returns></returns>
-        public async Task<double> ReadTemperature()
+        public async Task<double> ReadTemperature(bool serveTemp = true)
         {
             // create Uri for the desired endpoint
-            Uri endpoint = new Uri(_client.BaseAddress + "brewTemp");
+            Uri endpoint = new Uri(_client.BaseAddress + $"Temp/{serveTemp}");
 
             // fetch the temperature through a GET request 
             // returns a string (JSON) response
