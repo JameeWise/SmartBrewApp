@@ -7,14 +7,6 @@ using Newtonsoft.Json;
 
 namespace SmartBrewApp.Services
 {
-    /** *NOTE* Currently, these methods are all untested and dependent on the SmartBrewer.API */
-
-
-    /** Functions still needed (not a complete list and all are subject for discussion)
-     *  GET Brew status
-     *  likely several more I am missing 
-     *  most of these likely need a corresponding endpoint in the API as well
-     */
 
     /// <summary>
     /// internal class used for making requests to the server (i.e the pi)
@@ -24,7 +16,7 @@ namespace SmartBrewApp.Services
     {
         // base URL of the API, subject to change based on the API project
         // should be in the form http://<pi-IP>:<port>
-        private readonly string _baseURL = @"http://localhost:5000/api/smartBrewerapi";
+        private readonly string _baseURL = @"http://localhost:44367/api/smartBrewerapi";
 
         private readonly HttpClient _client;
 
@@ -37,7 +29,31 @@ namespace SmartBrewApp.Services
 
         }
 
-        public async Task<bool> StartNewBrew(int userId, int desiredCups)
+        /// <summary>
+        /// checks if we can connect with the API
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> VerifyConnection()
+        {
+            Uri endpoint = _client.BaseAddress;
+            string response = await _client.GetStringAsync(endpoint).ConfigureAwait(false);
+            bool.TryParse(response, out bool isConnected);
+            return isConnected;
+        }
+
+        /// <summary>
+        /// Verify python is running sucessfully on the server
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> CheckPython()
+        {
+            Uri endpoint = new Uri(_baseURL + "/python");
+            string response = await _client.GetStringAsync(endpoint).ConfigureAwait(false);
+
+            return response.Length > 0;
+        }
+
+        public async Task<string> StartNewBrew(int userId, int desiredCups = 12)
         {
             Uri endpoint = new Uri(_client.BaseAddress + $"Brew/{userId}");
 
@@ -46,8 +62,9 @@ namespace SmartBrewApp.Services
             ByteArrayContent byteContent = new ByteArrayContent(buffer);
 
             HttpResponseMessage response = await _client.PostAsync(endpoint, byteContent).ConfigureAwait(false);
-
-            return response.IsSuccessStatusCode;
+            return response.IsSuccessStatusCode 
+                ? "Brew Sucessful!" // this is pretty gross but neeed to return a string
+                : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
 
         /// <summary>
