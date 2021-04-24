@@ -12,20 +12,17 @@ namespace SmartBrewApp.Services
     /// internal class used for making requests to the server (i.e the pi)
     /// to retrieve brewer information
     /// </summary>
-    internal class BrewerService 
+    public class BrewerService 
     {
         // base URL of the API, subject to change based on the API project
         // should be in the form http://<pi-IP>:<port>
-        private readonly string _baseURL = @"http://localhost:44367/api/smartBrewerapi";
+        private readonly string _baseURL = @"http://10.0.1.167/api/smartBrewerapi";
 
         private readonly HttpClient _client;
 
-        internal BrewerService()
+        public BrewerService()
         {
-            _client = new HttpClient
-            {
-                BaseAddress = new Uri($"{_baseURL}/")
-            };
+            _client = new HttpClient();
 
         }
 
@@ -35,8 +32,7 @@ namespace SmartBrewApp.Services
         /// <returns></returns>
         public async Task<bool> VerifyConnection()
         {
-            Uri endpoint = _client.BaseAddress;
-            string response = await _client.GetStringAsync(endpoint).ConfigureAwait(false);
+            string response = await _client.GetStringAsync(_baseURL).ConfigureAwait(false);
             bool.TryParse(response, out bool isConnected);
             return isConnected;
         }
@@ -55,7 +51,7 @@ namespace SmartBrewApp.Services
 
         public async Task<string> StartNewBrew(int userId, int desiredCups = 12)
         {
-            Uri endpoint = new Uri(_client.BaseAddress + $"Brew/{userId}");
+            Uri endpoint = new Uri(_baseURL + $"Brew/{userId}");
 
             string serializedData = JsonConvert.SerializeObject(desiredCups);
             byte[] buffer = Encoding.UTF8.GetBytes(serializedData);
@@ -74,7 +70,7 @@ namespace SmartBrewApp.Services
         public async Task<double> ReadTemperature(bool serveTemp = true)
         {
             // create Uri for the desired endpoint
-            Uri endpoint = new Uri(_client.BaseAddress + $"Temp/{serveTemp}");
+            Uri endpoint = new Uri(_baseURL + $"Temp/{serveTemp}");
 
             // fetch the temperature through a GET request 
             // returns a string (JSON) response
@@ -88,7 +84,7 @@ namespace SmartBrewApp.Services
 
         public async Task<bool> CheckWaterLevel()
         {
-            Uri endpoint = new Uri(_client.BaseAddress + "waterLevel");
+            Uri endpoint = new Uri(_baseURL + "waterLevel");
             string response = await _client.GetStringAsync(endpoint).ConfigureAwait(false);
 
             bool.TryParse(response.Trim(), out bool isLow);
