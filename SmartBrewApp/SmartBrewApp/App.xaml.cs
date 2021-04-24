@@ -1,8 +1,5 @@
-﻿using System;
-using SmartBrewApp.Services;
-using SmartBrewApp.Views;
+﻿using SmartBrewApp.Services;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
 
 namespace SmartBrewApp
 {
@@ -14,6 +11,7 @@ namespace SmartBrewApp
             InitializeComponent();
 
             DependencyService.Register<MockDataStore>();
+            DependencyService.Register<BrewerService>();
             MainPage = new AppShell();
         }
 
