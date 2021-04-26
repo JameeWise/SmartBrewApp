@@ -16,13 +16,18 @@ namespace SmartBrewApp.Services
     {
         // base URL of the API, subject to change based on the API project
         // should be in the form http://<pi-IP>:<port>
-        private readonly string _baseURL = @"http://10.0.1.167/api/smartBrewerapi";
+        private readonly string _baseURL = @"http://10.0.1.167/api/smartBrewerapi/";
 
         private readonly HttpClient _client;
 
         public BrewerService()
         {
-            _client = new HttpClient();
+            _client = new HttpClient()
+            {
+                Timeout = TimeSpan.FromSeconds(400) // ~ 6.5 minutes
+            };
+
+            _client.DefaultRequestHeaders.Add("Accept", "application/json");
 
         }
 
@@ -43,7 +48,7 @@ namespace SmartBrewApp.Services
         /// <returns></returns>
         public async Task<bool> CheckPython()
         {
-            Uri endpoint = new Uri(_baseURL + "/python");
+            Uri endpoint = new Uri(_baseURL + "python");
             string response = await _client.GetStringAsync(endpoint).ConfigureAwait(false);
 
             return response.Length > 0;
@@ -53,12 +58,10 @@ namespace SmartBrewApp.Services
         {
             Uri endpoint = new Uri(_baseURL + $"Brew/{userId}");
 
-            string serializedData = JsonConvert.SerializeObject(desiredCups);
-            byte[] buffer = Encoding.UTF8.GetBytes(serializedData);
-            ByteArrayContent byteContent = new ByteArrayContent(buffer);
+            StringContent content = new StringContent(JsonConvert.SerializeObject(desiredCups), Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _client.PostAsync(endpoint, byteContent).ConfigureAwait(false);
-            return response.IsSuccessStatusCode 
+            HttpResponseMessage response = await _client.PostAsync(endpoint, content).ConfigureAwait(false);
+            return response.IsSuccessStatusCode
                 ? "Brew Sucessful!" // this is pretty gross but neeed to return a string
                 : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
