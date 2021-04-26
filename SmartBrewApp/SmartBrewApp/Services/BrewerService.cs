@@ -61,9 +61,7 @@ namespace SmartBrewApp.Services
             StringContent content = new StringContent(JsonConvert.SerializeObject(desiredCups), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await _client.PostAsync(endpoint, content).ConfigureAwait(false);
-            return response.IsSuccessStatusCode
-                ? "Brew Sucessful!" // this is pretty gross but neeed to return a string
-                : await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
 
         /// <summary>
